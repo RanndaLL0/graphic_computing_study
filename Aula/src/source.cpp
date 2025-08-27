@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <cstdlib>
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
+#include <time.h>
 
 const GLint WIDTH = 1024, HEIGHT = 728;
 GLuint VAO, VBO, shaderProgram;
@@ -14,7 +16,7 @@ static const char* vertexShader = "							\n\
 layout(location=0) in vec2 pos;								\n\
 															\n\
 void main() {												\n\
-	gl_Position() = vec4(pos.x,pos.y,0.0,1.0)				\n\
+	gl_Position = vec4(pos.x,pos.y,0.0,1.0);				\n\
 }															\n\
 															\n\
 															\n\
@@ -23,13 +25,16 @@ void main() {												\n\
 //Podemos entender um ponto como sendo um fragmento de uma poligono ou figura geométrica
 //iremos definir a cor da nossa figura geométrica
 //uma vez que sua cor possa ser alterada pela luz do programa
+//tricolor ira ser passado como argumento para dentro do programa
+//assim ele ira ser execultado quando alterarmos a cor do objeto
 static const char* fragmentShader = "						\n\
 #version 330												\n\
 															\n\
-uniform in vec3 triColor;									\n\
+uniform vec3 triColor;										\n\
+out vec4 color;												\n\
 															\n\
 void main() {												\n\
-	color = vec4(triColor,1.0)								\n\
+	color = vec4(triColor,1.0);								\n\
 }															\n\
 															\n\
 															\n\
@@ -46,7 +51,7 @@ void createTriangle() {
 	glGenVertexArrays(1, &VAO);
 	//posibilita a alteração do valor em espaço de memória apontando para o endereço
 	glBindVertexArray(VAO);
-		
+	
 	//aloca dentro do VAO o VBO
 	glGenBuffers(1, &VBO);
 	//aponta para o VBO
@@ -86,9 +91,9 @@ void add_program() {
 		printf("Erro ao criar o programa");
 		return;
 	}
+
 	add_triangle(shaderProgram, vertexShader,GL_VERTEX_SHADER);
 	add_triangle(shaderProgram, fragmentShader, GL_FRAGMENT_SHADER);
-
 	glLinkProgram(shaderProgram);
 }
 
@@ -106,7 +111,6 @@ int main() {
 
 	// Core profile -- extensões basicas para o opengl
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
 	//O glew ira utilizar da arquitetura disponivel da placa de video OBS: GL -> glew.
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
@@ -135,11 +139,29 @@ int main() {
 	}
 
 	glViewport(0,0,bufferWidth,bufferHeight);
-	
+
+	createTriangle();
+	add_program();
+
 	while (!glfwWindowShouldClose(window)) {
-		glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
+
+		//Cor de fundo da janela
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT);
+		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		float g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		float b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+		GLint uniformColor = glGetUniformLocation(shaderProgram, "triColor");
+		glUniform3f(uniformColor, r, g, b);
+
+		//Desenhando o triangulo
+		glUseProgram(shaderProgram);
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3); //Triangulo começando na posição 0, numero de pontos 3
+		glBindVertexArray(0);
+
 		glfwSwapBuffers(window);
 	}
 
