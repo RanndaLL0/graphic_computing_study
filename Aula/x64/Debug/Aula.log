@@ -1,2 +1,4 @@
 ﻿  source.cpp
-  Aula.vcxproj -> C:\Users\felipe.rvictor\projetos\Aula\x64\Debug\Aula.exe
+C:\Users\felipe.rvictor\source\repos\graphic_computing_study\Aula\src\source.cpp(20,17): warning C4305: 'inicializando': truncamento de 'double' para 'float'
+C:\Users\felipe.rvictor\source\repos\graphic_computing_study\Aula\src\source.cpp(176,9): warning C4101: 'timer': variável local não referenciada
+  Aula.vcxproj -> C:\Users\felipe.rvictor\source\repos\graphic_computing_study\x64\Debug\Aula.exe
